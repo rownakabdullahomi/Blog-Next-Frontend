@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import BlogCard from "@/components/modules/Blogs/BlogCard";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "All Blogs | Next Blog",
+  description: "Browse all blog post on web development, Next.js, React and more."
+}
 
 const AllBlogsPage = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/post`, {
     cache: "no-store",
   });
   const { data: blogs } = await res.json();
-  console.log(blogs);
+  // console.log(blogs);
 
   return (
     <div className="py-30 px-4 max-w-7xl mx-auto">
