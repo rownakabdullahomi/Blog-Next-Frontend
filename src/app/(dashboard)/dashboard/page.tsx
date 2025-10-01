@@ -6,7 +6,8 @@ export default async function DashboardHome() {
  
   const quote = "The secret of getting ahead is getting started. – Mark Twain";
 
-  const session = await getUserSession()
+  const session = await getUserSession();
+  console.log(session);
   
 
   return (

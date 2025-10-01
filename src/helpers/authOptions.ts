@@ -1,10 +1,64 @@
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          console.error("Email or Password is missing");
+          return null;
+        }
+
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_API}/auth/login`,
+            {
+              method: "POST",
+              headers: {
+                "content-type": "application/json",
+              },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
+
+          console.log("Response from backend: ", res);
+
+          if (!res.ok) {
+            console.error("Login Failed");
+            return null;
+          }
+
+          const user = await res.json();
+          if (user.id) {
+            // Any object returned will be saved in `user` property of the JWT
+            return {
+              id: user?.id,
+              name: user?.name,
+              email: user?.email,
+              image: user?.picture,
+            };
+          } else {
+            return null;
+          }
+        } catch (error) {
+          console.error(error);
+          return null;
+        }
+      },
     }),
   ],
   secret: process.env.AUTH_SECRET,
