@@ -1,13 +1,17 @@
 "use server";
 
+import { authOptions } from "@/helpers/authOptions";
+import { getUserSession } from "@/helpers/getUserSession";
+import { getServerSession } from "next-auth";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 export const create = async (data: FormData) => {
+  const session = await getServerSession(authOptions);
   const blogInfo = Object.fromEntries(data.entries());
   const modifiedData = {
     ...blogInfo,
-    authorId: 1,
+    authorId: session?.user?.id,
     isFeatured: Boolean(blogInfo.isFeatured),
     tags: blogInfo.tags
       .toString()
